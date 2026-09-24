@@ -1,0 +1,274 @@
+/* ---------------------------------------------------------------
+   Hero: Figma "Hero section" (498:1177).
+   Frame A (498:1156) is the first screen, and frame B (498:1166) is where scrolling takes it.
+   Both frames are 1500 × 900. Every moving value is written as  A + (B − A) × progress,
+   with two progress values that Hero.jsx scrubs from 0 to 1:
+     --p  copy: headline, paragraph, button block
+     --q  picture: sky, white wash, person
+   All positions are in Figma px, multiplied by --s (one Figma px on this screen).
+
+   Scroll budget while the scene is pinned, top to bottom:
+     --hero-scroll  frame A → frame B
+     100lvh         the testimonials slide up over frame B (testimonials.css pulls itself up by 100lvh)
+---------------------------------------------------------------- */
+
+.hero {
+  --hero-scroll: 90vh;
+  position: relative;
+  height: calc(100vh + var(--hero-scroll) + 100vh);
+  height: calc(100lvh + var(--hero-scroll) + 100lvh);
+  background: var(--color-secondary); /* shows round the scene as it recedes under the next section */
+}
+
+/* Markers for ScrollTrigger: where A → B ends and where the cover ends. */
+.hero-mark {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  visibility: hidden;
+}
+.hero-mark[data-mark='scene'] {
+  top: var(--hero-scroll);
+}
+.hero-mark[data-mark='cover'] {
+  top: calc(var(--hero-scroll) + 100vh);
+  top: calc(var(--hero-scroll) + 100lvh);
+}
+
+/* Darkens frame B as the next section covers it. */
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--color-secondary);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-scene {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+  overflow: clip;
+  background: var(--color-white);
+  container: hero / size;
+
+  --p: 0;
+  --q: 0;
+
+  /* The design frame is fitted inside the viewport and sits on its bottom edge, so the person always
+     reaches the bottom. On screens taller than the frame, --top is the spare height above it, and the copy
+     takes --lift of it so it doesn't float far above the person. */
+  --W: 1500;
+  --H: 900;
+  --s: min(100cqw / var(--W), 100cqh / var(--H));
+  --top: calc(100cqh - var(--H) * var(--s));
+  --lift: 0.5;
+
+  /* Copy block (498:1160 → 498:1170) */
+  --copy-top-a: 144;
+  --copy-top-b: 64;
+  --title-a: 72; /* Roboto Slab 500, -4% → 400, -5% */
+  --title-b: 44;
+  --title-lh: 1.2;
+  --sub-a: 20; /* Switzer 500, 20/28 → 18/26 */
+  --sub-b: 18;
+  --sub-lh-a: 1.4;
+  --sub-lh-b: 1.4444;
+  --sub-w: 21.7em; /* 434px at 20px; set in em so the lines break in the same place as the text shrinks */
+  --title-gap: 16;
+  --cta-gap: 20;
+  --cta: 18; /* Fustat 700 18/25, the same in both frames */
+
+  /* Person (498:1159 → 498:1169): a square cut-out, centred, running off the bottom edge */
+  --person-a: 494;
+  --person-b: 644;
+  --person-top-a: 481;
+  --person-top-b: 315;
+
+  /* Sky (498:1157 → 498:1167): 1676 × 1396 centred at y 360 → 1560 × 1300 centred at y 274 */
+  --sky-w: 1676;
+  --sky-cy-a: 360;
+  --sky-cy-b: 274;
+  --sky-k: 0.9308;
+
+  /* White wash (498:1158 → 498:1168): a very flat radial gradient from the top edge */
+  --wash-rx: 3791;
+  --wash-ry: 901;
+  --wash-cy: 11;
+  --wash-a: 42.9; /* position of the 90% white stop, % of the radius */
+  --wash-b: 25;
+}
+
+/* Portrait screens (phones, tablets upright): same scene recomposed on a 390 × 844 frame. */
+@media (aspect-ratio <= 1) {
+  .hero {
+    --hero-scroll: 70vh;
+  }
+  .hero-scene {
+    --W: 390;
+    --H: 844;
+
+    --copy-top-a: 150;
+    --copy-top-b: 44;
+    --title-a: 31;
+    --title-b: 26;
+    --title-lh: 1.16;
+    --sub-a: 16;
+    --sub-b: 15;
+    --sub-lh-a: 1.5;
+    --sub-lh-b: 1.4667;
+    --sub-w: 20em;
+    --title-gap: 14;
+    --cta-gap: 22;
+    --cta: 16;
+
+    --person-a: 440;
+    --person-b: 540;
+    --person-top-a: 450;
+    --person-top-b: 320;
+
+    --sky-w: 1488; /* 1488 × 1239; frame B keeps its bottom edge below 844 */
+    --sky-cy-a: 300;
+    --sky-cy-b: 256;
+    --sky-k: 0.96;
+
+    --wash-rx: 2000;
+    --wash-ry: 844;
+    --wash-cy: 0;
+  }
+}
+
+/* Short landscape screens (phones on their side): the text can't shrink as far as the frame does,
+   so the person starts lower to keep his head clear of the button. */
+@media (aspect-ratio > 1) and (max-height: 520px) {
+  .hero-scene {
+    --lift: 0;
+    --person-top-a: 575;
+    --person-top-b: 410;
+  }
+}
+
+/* ---- Picture layers ------------------------------------------------ */
+
+.hero-sky {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--top) + var(--sky-cy-a) * var(--s));
+  /* Never narrower than the screen, even after it shrinks to --sky-k in frame B */
+  width: max(calc(var(--sky-w) * var(--s)), 108cqw);
+  aspect-ratio: 1676 / 1396;
+  translate: -50% calc(-50% + (var(--sky-cy-b) - var(--sky-cy-a)) * var(--s) * var(--q));
+  scale: calc(1 + (var(--sky-k) - 1) * var(--q));
+}
+.hero-sky img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-wash {
+  --stop: calc(var(--wash-a) + (var(--wash-b) - var(--wash-a)) * var(--q));
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: calc(var(--top) + var(--H) * var(--s));
+  pointer-events: none;
+  /* Figma blends 90% white into transparent grey without premultiplying, so the fade passes through
+     translucent greys. CSS premultiplies, so the in-between greys are written out as stops. */
+  background: radial-gradient(
+    calc(var(--wash-rx) * var(--s)) calc(var(--wash-ry) * var(--s)) at 50% calc(var(--top) + var(--wash-cy) * var(--s)),
+    rgb(255 255 255 / 1) 0%,
+    rgb(255 255 255 / 0.9) calc(var(--stop) * 1%),
+    rgb(235 235 235 / 0.675) calc((var(--stop) + (100 - var(--stop)) * 0.25) * 1%),
+    rgb(215 215 215 / 0.45) calc((var(--stop) + (100 - var(--stop)) * 0.5) * 1%),
+    rgb(194 194 194 / 0.225) calc((var(--stop) + (100 - var(--stop)) * 0.75) * 1%),
+    rgb(174 174 174 / 0) 100%
+  );
+}
+
+/* Laid out at its frame-B size and position; frame A is the same box scaled down from its top centre. */
+.hero-person {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--top) + var(--person-top-b) * var(--s));
+  width: calc(var(--person-b) * var(--s));
+  aspect-ratio: 1;
+  transform-origin: 50% 0;
+  translate: -50% calc((var(--person-top-a) - var(--person-top-b)) * var(--s) * (1 - var(--q)));
+  scale: calc((var(--person-a) + (var(--person-b) - var(--person-a)) * var(--q)) / var(--person-b));
+  pointer-events: none;
+}
+.hero-person img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---- Copy ---------------------------------------------------------- */
+
+.hero-copy {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--top) * var(--lift) + (var(--copy-top-a) + (var(--copy-top-b) - var(--copy-top-a)) * var(--p)) * var(--s));
+  translate: -50% 0;
+  width: max-content;
+  max-width: 100cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  color: var(--color-secondary);
+  font-size: calc((var(--title-a) + (var(--title-b) - var(--title-a)) * var(--p)) * var(--s));
+  font-weight: calc(500 - 100 * var(--p));
+  letter-spacing: calc((-0.04 - 0.01 * var(--p)) * 1em);
+  line-height: var(--title-lh);
+  white-space: nowrap; /* line breaks are fixed in the markup, per layout */
+}
+
+.hero-sub {
+  margin-top: calc(var(--title-gap) * var(--s));
+  width: var(--sub-w);
+  max-width: calc(100cqw - 32px);
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--color-gray-70);
+  font-size: max(14px, calc((var(--sub-a) + (var(--sub-b) - var(--sub-a)) * var(--p)) * var(--s)));
+  line-height: calc(var(--sub-lh-a) + (var(--sub-lh-b) - var(--sub-lh-a)) * var(--p));
+  letter-spacing: -0.02em;
+}
+
+.hero-cta {
+  margin-top: calc(var(--cta-gap) * var(--s));
+  font-size: clamp(15px, calc(var(--cta) * var(--s)), 20px);
+}
+
+/* Each layout hides the other layout's line breaks. */
+@media (aspect-ratio > 1) {
+  .hero-title .br-portrait {
+    display: none;
+  }
+}
+@media (aspect-ratio <= 1) {
+  .hero-title .br-wide {
+    display: none;
+  }
+}
+
+/* Reduced motion: no pinning. The hero is a single 100vh screen showing frame A. */
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    height: auto;
+  }
+  .hero-scene {
+    position: relative;
+  }
+}

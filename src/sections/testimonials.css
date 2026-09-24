@@ -1,0 +1,268 @@
+/* ---------------------------------------------------------------
+   Testimonials: Figma "Testimonial section" (498:1444).
+   498:1292 is the resting carousel; 498:1389 shows its hover state and the track mid-slide.
+   Like the hero, the section is a 1500 × 900 frame fitted to one screen, and every size is in Figma px
+   times --s. It pulls itself up by one screen, so it slides over the pinned hero once frame B is reached.
+---------------------------------------------------------------- */
+
+.stories {
+  position: relative;
+  z-index: 2;
+  margin-top: -100vh;
+  margin-top: -100lvh;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+  overflow: clip;
+  background: var(--color-secondary);
+  color: var(--color-white);
+  container: stories / size;
+
+  /* Set by Testimonials.jsx: the current card and the card count */
+  --k: 0;
+  --n: 1;
+  --ease-slide: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --W: 1500;
+  --H: 900;
+  --s: min(100cqw / var(--W), 100cqh / var(--H));
+  --frame-x: calc((100cqw - var(--W) * var(--s)) / 2);
+  --frame-y: calc((100cqh - var(--H) * var(--s)) / 2);
+
+  --pad: 80; /* left and right content margin */
+  --head-top: 95;
+  --title: 52;
+  --sub: 18;
+  --sub-lh: 1.4444; /* 26px */
+  --head-gap: 16;
+  --nav-top: 151; /* the arrows sit on the header's bottom edge: 95 + 56 */
+  --nav-size: 48;
+  --nav-icon: 24;
+  --nav-gap: 11;
+
+  --rail-top: 247;
+  --card-h: 560;
+  --card-a: 512; /* current card */
+  --card-i: 480; /* every other card */
+  --gap: 20;
+  --btn: 18; /* Watch: Fustat 700 18/25, padding 16/24, 24px icon, 24px from the card corner */
+  --btn-inset: 24;
+
+  /* How far the track moves: one card per step, but it never pulls the last card
+     past the right margin. All cards but one are --card-i wide, so the track's length is fixed. */
+  --avail: calc(var(--W) - 2 * var(--pad));
+  --offset: min(
+    var(--k) * (var(--card-i) + var(--gap)),
+    max(0, var(--card-a) + (var(--n) - 1) * (var(--card-i) + var(--gap)) - var(--avail))
+  );
+}
+
+/* Portrait screens: a 390 × 844 frame, taller cards, arrows under the track. */
+@media (aspect-ratio <= 1) {
+  .stories {
+    --W: 390;
+    --H: 844;
+    --pad: 20;
+    --head-top: 96;
+    --title: 32;
+    --sub: 16;
+    --sub-lh: 1.5;
+    --head-gap: 12;
+    --rail-top: 226;
+    --card-h: 440;
+    --card-a: 320;
+    --card-i: 300;
+    --gap: 12;
+    --nav-top: 690; /* rail top + card height + 24 */
+    --btn: 16;
+    --btn-inset: 16;
+  }
+}
+
+.stories-head {
+  position: absolute;
+  left: calc(var(--frame-x) + var(--pad) * var(--s));
+  top: calc(var(--frame-y) + var(--head-top) * var(--s));
+  width: calc((var(--W) - 2 * var(--pad)) * var(--s));
+}
+@media (aspect-ratio > 1) {
+  .stories-head {
+    width: calc(631 * var(--s)); /* Figma text column */
+  }
+}
+
+.stories-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: calc(var(--title) * var(--s));
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.stories-sub {
+  margin-top: calc(var(--head-gap) * var(--s));
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(14px, calc(var(--sub) * var(--s)));
+  line-height: var(--sub-lh);
+  color: rgb(255 255 255 / 0.8);
+}
+
+/* ---- Arrows -------------------------------------------------------- */
+
+.stories-nav {
+  position: absolute;
+  right: calc(var(--frame-x) + var(--pad) * var(--s));
+  top: calc(var(--frame-y) + var(--nav-top) * var(--s));
+  display: flex;
+  gap: calc(var(--nav-gap) * var(--s));
+}
+.stories-arrow {
+  display: grid;
+  place-items: center;
+  width: max(40px, calc(var(--nav-size) * var(--s)));
+  aspect-ratio: 1;
+  background: #3d4045;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+.stories-arrow:hover {
+  background: #4d4e51;
+}
+.stories-arrow:disabled {
+  background: transparent;
+  opacity: 0.2;
+  cursor: default;
+}
+.stories-arrow img {
+  width: calc(var(--nav-icon) / var(--nav-size) * 100%);
+  height: auto;
+}
+.stories-arrow[data-dir='next'] img {
+  rotate: 180deg;
+}
+.stories-arrow:focus-visible {
+  outline-color: var(--color-white);
+}
+
+/* ---- Cards --------------------------------------------------------- */
+
+/* The rail slides in from the right as the section arrives (Testimonials.jsx);
+   the track inside it moves one card per step. */
+.stories-rail {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(var(--frame-y) + var(--rail-top) * var(--s));
+  height: calc(var(--card-h) * var(--s));
+  touch-action: pan-y;
+}
+
+.stories-track {
+  display: flex;
+  gap: calc(var(--gap) * var(--s));
+  height: 100%;
+  padding-left: calc(var(--frame-x) + var(--pad) * var(--s));
+  translate: calc(var(--offset) * var(--s) * -1) 0;
+  transition: translate 700ms var(--ease-slide);
+}
+
+.story {
+  position: relative;
+  flex: none;
+  cursor: pointer; /* a click anywhere on the card plays the story, same as its button */
+  width: calc(var(--card-i) * var(--s));
+  height: 100%;
+  overflow: hidden;
+  background: #7d7e80;
+  transition: width 700ms var(--ease-slide);
+}
+.story[data-current] {
+  width: calc(var(--card-a) * var(--s));
+}
+
+.story img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Dark wash: 40% on resting cards, 10% on the current one, none under the pointer. */
+.story::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--color-secondary);
+  opacity: 0.4;
+  transition: opacity 240ms ease;
+  pointer-events: none;
+}
+.story[data-current]::before {
+  opacity: 0.1;
+}
+
+.story-watch {
+  position: absolute;
+  z-index: 2;
+  right: calc(var(--btn-inset) * var(--s));
+  bottom: calc(var(--btn-inset) * var(--s));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.444em; /* 8px */
+  padding: 0.889em 1.333em; /* 16 / 24 */
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: max(14px, calc(var(--btn) * var(--s)));
+  line-height: 1.389; /* 25px */
+  color: var(--color-white);
+  background: rgb(29 32 36 / 0.8);
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+.story-watch::before {
+  content: '';
+  width: 1.333em; /* 24px */
+  aspect-ratio: 1;
+  background: currentColor;
+  mask: url('/icons/play.svg') center / contain no-repeat;
+}
+.story-watch:focus-visible {
+  outline-color: var(--color-white);
+}
+
+/* Hover (Figma 498:1391): the wash lifts and the button turns white. */
+@media (hover: hover) {
+  .story:hover::before {
+    opacity: 0;
+  }
+  .story:hover .story-watch {
+    background: var(--color-white);
+    color: var(--color-secondary);
+  }
+}
+.story:focus-within::before {
+  opacity: 0;
+}
+.story-watch:focus-visible {
+  background: var(--color-white);
+  color: var(--color-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stories {
+    margin-top: 0;
+  }
+  .stories-track,
+  .story {
+    transition: none;
+  }
+}

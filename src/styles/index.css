@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------
+   Reidius Infra V2 tokens.
+   Source: reidius-infra-design-system.md, checked against the Figma file "Claude -> ME".
+   Secondary is #1D2024: the doc leaves it unconfirmed, and it's the dark every Figma frame uses.
+   The default Tailwind palette and radius scale are wiped so only these values exist.
+---------------------------------------------------------------- */
+@theme {
+  --color-*: initial;
+  --color-primary: #f9ef5d;
+  --color-secondary: #1d2024;
+  --color-accent: #837762;
+  --color-gray-80: #3e3e3e;
+  --color-gray-70: #595959;
+  --color-gray-50: #aeaeae;
+  --color-gray-20: #f2f2f2;
+  --color-white: #ffffff;
+
+  --font-heading: 'Roboto Slab', Georgia, serif;
+  --font-body: 'Switzer', 'Helvetica Neue', Arial, sans-serif;
+  --font-ui: 'Fustat', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Hard rule from the design system: no rounded corners anywhere. */
+  --radius-*: initial;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Keeps the layout still when a section holds the page and the scrollbar hides (Journey.jsx). */
+    scrollbar-gutter: stable;
+  }
+  body {
+    background: var(--color-white);
+    color: var(--color-gray-80);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Buttons: square, flat fill, no shadow. Hover swaps to the brand yellow. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.889em 1.333em; /* 16 / 24 at the 18px Figma size */
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.389; /* 25px */
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease;
+  }
+  .btn-dark {
+    background: var(--color-secondary);
+    color: var(--color-white);
+  }
+  .btn-dark:hover {
+    background: var(--color-primary);
+    color: var(--color-secondary);
+  }
+  .btn:active {
+    translate: 0 1px;
+  }
+}

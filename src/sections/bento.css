@@ -1,0 +1,238 @@
+/* ---------------------------------------------------------------
+   App bento: Figma "Bento" (504:2841), a 1500 × 1332 frame on the dark background. Static.
+   Four cards in two staggered columns: daily updates (512 tall) over the camera card (448) on the left,
+   the project manager (448) over expenses (512) on the right, 20 apart.
+   Section sizes are Figma px times --s, like the other sections. Inside a card, --a is one Figma px of that
+   card (its width / 660), so the artwork keeps its composition at any card width.
+---------------------------------------------------------------- */
+
+.bento {
+  position: relative;
+  background: var(--color-secondary);
+  color: var(--color-white);
+  container: bento / inline-size;
+
+  --W: 1500;
+  --H: 900;
+  --s: min(100cqw / var(--W), 100vh / var(--H));
+  --frame-x: calc((100cqw - var(--W) * var(--s)) / 2);
+}
+
+.bento-inner {
+  padding: calc(48 * var(--s)) calc(var(--frame-x) + 80 * var(--s));
+}
+
+.bento-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: calc(52 * var(--s)); /* Roboto Slab 500, 1.2, -4% */
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
+.bento-sub {
+  margin-top: calc(16 * var(--s));
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(14px, calc(18 * var(--s))); /* Switzer 400, 18/26, 80% */
+  line-height: 1.4444;
+  color: rgb(255 255 255 / 0.8);
+}
+.bento-title span,
+.bento-sub span,
+.bento-card-title span {
+  display: block;
+}
+
+/* Staggered grid: rows of 448 / 44 / 448 with 20 gaps give the 512 + 448 and 448 + 512 columns. */
+.bento-grid {
+  margin-top: calc(64 * var(--s));
+  display: grid;
+  grid-template-columns: repeat(2, calc(660 * var(--s)));
+  grid-template-rows: calc(448 * var(--s)) calc(44 * var(--s)) calc(448 * var(--s));
+  gap: calc(20 * var(--s));
+  grid-template-areas:
+    'daily manager'
+    'daily expenses'
+    'camera expenses';
+}
+
+/* ---- Card ---------------------------------------------------------- */
+
+.bento-card {
+  --a: calc(100cqw / 660);
+  position: relative;
+  overflow: hidden;
+  background: #2e3238;
+  container-type: inline-size;
+}
+.bento-daily {
+  grid-area: daily;
+  --art-h: 512;
+  --img-top: 137;
+}
+.bento-manager {
+  grid-area: manager;
+  --art-h: 448;
+  --img-top: 185;
+}
+.bento-camera {
+  grid-area: camera;
+  --art-h: 448;
+  --img-top: 89;
+}
+.bento-expenses {
+  grid-area: expenses;
+  --art-h: 512;
+  --img-top: 89;
+}
+
+.bento-text {
+  position: relative;
+  z-index: 3;
+  padding: max(20px, calc(32 * var(--a)));
+}
+.bento-card-title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: max(19px, calc(24 * var(--a))); /* Switzer 600, 24/32, -1% */
+  line-height: 1.3333;
+  letter-spacing: -0.01em;
+}
+.bento-card-body {
+  margin-top: max(6px, calc(7 * var(--a)));
+  max-width: max(260px, calc(377 * var(--a)));
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(14px, calc(16 * var(--a))); /* Switzer 400, 16/24, 80% */
+  line-height: 1.5;
+  color: rgb(255 255 255 / 0.8);
+}
+
+/* The artwork: a layer as tall as the Figma card, pinned to the card's bottom edge. */
+.bento-art {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0;
+  height: calc(var(--art-h) * var(--a));
+  pointer-events: none;
+}
+.bento-art img,
+.bento-bg {
+  position: absolute;
+  max-width: none;
+}
+
+.bento-daily .bento-art img {
+  /* 503 × 823 turned 1.24°, centred where Figma's 520.6 × 833.8 bounding box puts it */
+  left: calc(126.8 * var(--a));
+  top: calc(142.3 * var(--a));
+  width: calc(503 * var(--a));
+  rotate: 1.24deg;
+}
+.bento-camera .bento-art img {
+  left: calc(293.2 * var(--a));
+  top: calc(89 * var(--a));
+  width: calc(339.46 * var(--a));
+}
+.bento-expenses .bento-art img {
+  left: calc(141 * var(--a));
+  top: calc(89 * var(--a));
+  width: calc(491.6 * var(--a));
+}
+
+/* Project manager: site photo, a dark wash from the top-left, the manager, and a blurred shape behind the text. */
+.bento-manager .bento-art img {
+  left: calc(294 * var(--a));
+  top: calc(185 * var(--a));
+  width: calc(299 * var(--a));
+}
+.bento-bg {
+  z-index: 0;
+  left: calc(-126 * var(--a));
+  top: calc(-76 * var(--a));
+  width: calc(840 * var(--a));
+  height: calc(625 * var(--a));
+  object-fit: cover;
+}
+.bento-wash {
+  position: absolute;
+  z-index: 0;
+  left: calc(-16 * var(--a));
+  top: calc(-60 * var(--a));
+  width: calc(682 * var(--a));
+  height: calc(560 * var(--a));
+  backdrop-filter: blur(2px);
+  /* Figma's gradient, verbatim: a tilted ellipse from #2e3238 to 10% */
+  background: url("data:image/svg+xml;utf8,<svg viewBox='0 0 682 560' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><rect x='0' y='0' height='100%' width='100%' fill='url(%23grad)'/><defs><radialGradient id='grad' gradientUnits='userSpaceOnUse' cx='0' cy='0' r='10' gradientTransform='matrix(9.6 35.75 -124.62 33.463 245 202.5)'><stop stop-color='rgba(46,50,56,1)' offset='0'/><stop stop-color='rgba(46,50,56,0.1)' offset='1'/></radialGradient></defs></svg>")
+    0 0 / 100% 100%;
+}
+.bento-fade {
+  position: absolute;
+  z-index: 2;
+  left: calc(-187 * var(--a));
+  top: calc(-156.5 * var(--a));
+  width: calc(991 * var(--a));
+  height: calc(512 * var(--a));
+  pointer-events: none;
+}
+
+/* ---- Portrait screens: one column; each card is its text plus the artwork, which starts just under the text. ---- */
+@media (aspect-ratio <= 1) {
+  .bento {
+    --W: 390;
+    --H: 844;
+  }
+  .bento-inner {
+    padding: calc(64 * var(--s)) calc(20 * var(--s));
+  }
+  .bento-title {
+    font-size: calc(32 * var(--s));
+  }
+  .bento-sub {
+    margin-top: calc(12 * var(--s));
+  }
+  .bento-sub span {
+    display: inline;
+  }
+  .bento-grid {
+    margin-top: calc(36 * var(--s));
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas: none;
+    gap: calc(16 * var(--s));
+  }
+  .bento-card {
+    grid-area: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .bento-text {
+    order: 0;
+    padding-bottom: 0;
+  }
+  .bento-art {
+    order: 1;
+  }
+  /* The artwork joins the flow under the text, pulled up so its image starts 16px below the text.
+     (Set here rather than as card padding: --a has to be resolved inside the card to mean the card's width.) */
+  .bento-art {
+    position: relative;
+    inset: auto;
+    margin-top: calc(16px - var(--img-top) * var(--a));
+  }
+  /* The site photo keeps Figma's placement relative to the artwork (now the card's bottom edge), so the
+     person in it stays under the cut-out; the wash fades the top of the card into its own colour. */
+  .bento-bg {
+    top: auto;
+    bottom: calc(-101 * var(--a));
+  }
+  .bento-wash {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #2e3238 20%, rgb(46 50 56 / 0.1));
+  }
+  .bento-fade {
+    display: none;
+  }
+}

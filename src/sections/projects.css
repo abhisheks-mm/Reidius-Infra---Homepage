@@ -1,0 +1,366 @@
+/* ---------------------------------------------------------------
+   Projects: Figma 504:2864, a 1500 × 1646 frame on white.
+   Headline; Completed / Under construction tabs and Download Portfolio; the featured project (1000 × 658)
+   with its client, type and area to its left; arrows and View All; then a strip of the projects that come
+   next, which runs off the right edge (the first one 320 wide, under the client details, the rest 547).
+   The arrows (or a click on a thumbnail) move the strip along: the next project slides into the feature.
+   Sizes are Figma px times --s, like the other sections.
+---------------------------------------------------------------- */
+
+.work {
+  position: relative;
+  background: var(--color-white);
+  color: var(--color-secondary);
+  container: work / inline-size;
+
+  --W: 1500;
+  --H: 900;
+  --s: min(100cqw / var(--W), 100vh / var(--H));
+  --frame-x: calc((100cqw - var(--W) * var(--s)) / 2);
+  --x0: calc(var(--frame-x) + 80 * var(--s)); /* content edge */
+
+  /* thumbnail strip: the first slot is narrower */
+  --t0: 320;
+  --t: 547;
+  --th: 319;
+  --tgap: 20;
+  --ease-slide: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Everything above the strip, laid out as in Figma. */
+.work-top {
+  position: relative;
+  height: calc(1090 * var(--s));
+}
+.work-title {
+  position: absolute;
+  left: var(--x0);
+  top: calc(64 * var(--s));
+  width: calc(681 * var(--s));
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: calc(52 * var(--s)); /* Roboto Slab 500, 1.2, -4% */
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
+
+/* ---- Tabs and the portfolio button (Switzer 600, 18/25, padding 16/24) ---- */
+
+.work-tabs {
+  position: absolute;
+  left: var(--x0);
+  top: calc(223 * var(--s));
+  display: flex;
+  padding: calc(4 * var(--s));
+  background: var(--color-gray-20);
+}
+.work-tab,
+.work-download,
+.work-all-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: max(14px, calc(18 * var(--s)));
+  line-height: 1.389;
+  white-space: nowrap;
+}
+.work-tab {
+  padding: 0.889em 1.333em;
+  background: var(--color-gray-20);
+  color: #7b7b7b;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+.work-tab:hover {
+  color: var(--color-secondary);
+}
+.work-tab[aria-selected='true'] {
+  background: var(--color-white);
+  color: var(--color-secondary);
+}
+.work-download {
+  position: absolute;
+  right: var(--x0);
+  top: calc(227 * var(--s));
+  padding: 0.889em 1.333em;
+  background: var(--color-primary);
+  color: var(--color-secondary);
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+.work-download:hover {
+  background: var(--color-secondary);
+  color: var(--color-white);
+}
+
+/* ---- Featured project ---------------------------------------------- */
+
+.work-feature {
+  position: absolute;
+  left: calc(var(--frame-x) + 420 * var(--s));
+  top: calc(316 * var(--s));
+  width: calc(1000 * var(--s));
+  height: calc(658 * var(--s));
+  overflow: hidden;
+  background: var(--color-gray-20);
+}
+.work-feature img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  scale: 1.03;
+  transition:
+    opacity 600ms ease,
+    scale 900ms var(--ease-slide);
+}
+.work-feature img[data-on] {
+  opacity: 1;
+  scale: 1;
+}
+
+/* Client details sit on the image's bottom edge (Figma: 847 → 974). */
+.work-info {
+  position: absolute;
+  left: var(--x0);
+  bottom: calc((1090 - 974) * var(--s));
+  width: calc(320 * var(--s));
+  animation: work-info 500ms ease both;
+}
+@keyframes work-info {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+.work-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: max(18px, calc(24 * var(--s))); /* Roboto Slab 600, 24/32 */
+  line-height: 1.3333;
+  color: #000;
+}
+.work-type,
+.work-place {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: max(14px, calc(18 * var(--s))); /* Switzer 500, 18/25 */
+  line-height: 1.389;
+  color: #000;
+}
+.work-type {
+  margin-top: calc(8 * var(--s));
+  opacity: 0.6;
+}
+.work-place {
+  margin-top: calc(37 * var(--s));
+}
+
+/* ---- Arrows and View All --------------------------------------------- */
+
+.work-controls {
+  position: absolute;
+  left: var(--x0);
+  right: var(--x0);
+  top: calc(1006 * var(--s));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.work-arrows {
+  display: flex;
+  gap: calc(11 * var(--s));
+}
+.work-arrow {
+  display: grid;
+  place-items: center;
+  width: max(40px, calc(48 * var(--s)));
+  aspect-ratio: 1;
+  background: rgb(61 64 69 / 0.1);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+.work-arrow:hover {
+  background: rgb(61 64 69 / 0.2);
+}
+.work-arrow:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+.work-arrow:disabled:hover {
+  background: rgb(61 64 69 / 0.1);
+}
+.work-arrow img,
+.work-all-btn img {
+  width: max(20px, calc(24 * var(--s)));
+  height: auto;
+}
+.work-arrow[data-dir='next'] img,
+.work-all-btn img {
+  rotate: 180deg;
+}
+.work-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.444em;
+  padding: 0.667em 0.889em; /* 12 / 16 */
+  background: rgb(61 64 69 / 0.2);
+  color: var(--color-secondary);
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+.work-all-btn:hover {
+  background: rgb(61 64 69 / 0.3);
+}
+.work-all-btn[aria-expanded='true'] img {
+  rotate: -90deg;
+}
+
+/* ---- Strip of the next projects --------------------------------------- */
+
+/* Clipped at the content edge on the left, open to the screen edge on the right. */
+.work-rail {
+  position: relative;
+  height: calc(var(--th) * var(--s));
+  margin-left: var(--x0);
+  overflow: hidden;
+  overflow: clip;
+}
+/* --slot: 0 is the first (narrow) place, 1, 2… follow; below 0 means already shown, parked off to the left. */
+.work-thumb {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: calc(
+    min(var(--slot), 1) * (var(--t0) + var(--tgap)) * var(--s) + max(var(--slot) - 1, 0) * (var(--t) + var(--tgap)) *
+      var(--s)
+  );
+  width: calc((var(--t) + (var(--t0) - var(--t)) * (1 - min(max(var(--slot), 0), 1))) * var(--s));
+  padding: 0;
+  overflow: hidden;
+  background: var(--color-gray-20);
+  cursor: pointer;
+  transition:
+    left 700ms var(--ease-slide),
+    width 700ms var(--ease-slide);
+}
+.work-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: scale 500ms var(--ease-slide);
+}
+@media (hover: hover) {
+  .work-thumb:hover img {
+    scale: 1.04;
+  }
+}
+.work-thumb:focus-visible {
+  outline-offset: -3px;
+  outline-color: var(--color-white);
+}
+
+/* ---- View All: every project in the tab ------------------------------ */
+
+.work-all {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(32 * var(--s)) calc(20 * var(--s));
+  margin-inline: var(--x0);
+}
+.work-all img {
+  width: 100%;
+  aspect-ratio: 547 / 319;
+  object-fit: cover;
+  background: var(--color-gray-20);
+}
+.work-all .work-name {
+  margin-top: calc(14 * var(--s));
+  font-size: max(17px, calc(20 * var(--s)));
+}
+.work-all .work-type {
+  margin-top: calc(2 * var(--s));
+  font-size: max(14px, calc(16 * var(--s)));
+}
+
+.work-end {
+  height: calc((1646 - 1409) * var(--s)); /* Figma's space below the strip */
+}
+
+/* ---- Portrait screens: everything in one column --------------------------- */
+@media (aspect-ratio <= 1) {
+  .work {
+    --W: 390;
+    --H: 844;
+    --x0: calc(var(--frame-x) + 20 * var(--s));
+    --t0: 200;
+    --t: 260;
+    --th: 160;
+    --tgap: 12;
+  }
+  .work-top {
+    height: auto;
+    padding: calc(64 * var(--s)) var(--x0) calc(20 * var(--s));
+    display: flex;
+    flex-direction: column;
+  }
+  .work-top > * {
+    position: relative;
+    inset: auto;
+  }
+  .work-title {
+    width: auto;
+    font-size: calc(30 * var(--s));
+  }
+  .work-tabs {
+    margin-top: calc(24 * var(--s));
+    align-self: stretch;
+  }
+  .work-tab {
+    flex: 1;
+  }
+  .work-download {
+    margin-top: calc(12 * var(--s));
+    text-align: center;
+  }
+  .work-feature {
+    width: auto;
+    height: auto;
+    aspect-ratio: 1000 / 658;
+    margin-top: calc(20 * var(--s));
+  }
+  .work-info {
+    width: auto;
+    margin-top: calc(14 * var(--s));
+  }
+  .work-place {
+    margin-top: calc(10 * var(--s));
+  }
+  .work-controls {
+    margin-top: calc(20 * var(--s));
+  }
+  .work-all {
+    grid-template-columns: 1fr;
+  }
+  .work-end {
+    height: calc(64 * var(--s));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-feature img,
+  .work-thumb,
+  .work-thumb img {
+    transition: none;
+  }
+  .work-info {
+    animation: none;
+  }
+}

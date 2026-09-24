@@ -1,0 +1,311 @@
+/* ---------------------------------------------------------------
+   Journey: Figma "10 steps" (500:2722), a 1500 × 948 frame that fits one screen.
+     500:2508  progress bar at the first stage, which is open (icon, padding, its line of copy)
+     500:2577  bar has run down to "Cost Estimation", which is now the open one
+   When the section reaches the top of the screen the page holds there and the bar runs down the 10 stages
+   on its own (Journey.jsx); the stage it is in opens, and the right-hand panel (the full screen height)
+   shows that stage. Closed stages show their title only. Sizes are Figma px times --s.
+---------------------------------------------------------------- */
+
+.journey {
+  position: relative;
+  background: var(--color-white);
+}
+
+/* While the stages play, the page doesn't scroll (Journey.jsx adds this class and removes it at the end). */
+html.journey-hold {
+  overflow: hidden;
+}
+
+.journey-scene {
+  position: relative;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+  overflow: clip;
+  container: journey / size;
+
+  --W: 1500;
+  --H: 948;
+  --s: min(100cqw / var(--W), 100cqh / var(--H));
+  --frame-x: calc((100cqw - var(--W) * var(--s)) / 2);
+  --frame-y: calc((100cqh - var(--H) * var(--s)) / 2);
+
+  --title: 48; /* Roboto Slab 500, 1.2, -4% */
+  --sub: 18; /* Switzer 400, 18/26 */
+  --sub-lh: 1.4444;
+  --head-gap: 16;
+  --track-gap: 12;
+  --list-w: 485;
+  --step-gap: 17; /* stage ↔ divider */
+  --step-title: 20; /* Roboto Slab 500, 20/28, -1% */
+  --step-body: 16; /* Switzer 400, 16/24, -2.5%, 60% */
+  --icon: 64;
+  --open-pad-y: 12;
+  --open-pad-x: 16;
+  --open-gap: 16;
+}
+
+/* ---- Wide screens: Figma's frame, fitted to the screen ---------------- */
+
+.journey-head {
+  position: absolute;
+  left: calc(var(--frame-x) + 80 * var(--s));
+  top: calc(var(--frame-y) + 48 * var(--s));
+  width: calc(547 * var(--s));
+}
+.journey-listbox {
+  position: absolute;
+  left: calc(var(--frame-x) + 80 * var(--s));
+  top: calc(var(--frame-y) + 254 * var(--s));
+  bottom: 0;
+}
+.journey-media {
+  position: absolute;
+  inset: 0 0 0 calc(var(--frame-x) + 647 * var(--s));
+  overflow: hidden;
+  background: #f7f7f7; /* Figma: #d9d9d9 at 20% on white */
+}
+
+/* ---- Portrait screens: heading, then the panel, then the stages; the list glides to keep the open
+   stage in view if the screen is too short for all ten. Sizes scale with the width only. ---- */
+@media (aspect-ratio <= 1) {
+  .journey-scene {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100svh;
+    --s: min(100cqw / 390, 1.5px);
+    --title: 28;
+    --sub: 15;
+    --sub-lh: 1.4667;
+    --head-gap: 8;
+    --list-w: 336;
+    --step-gap: 9;
+    --step-title: 16;
+    --step-body: 14;
+    --icon: 44;
+    --open-pad-y: 8;
+    --open-pad-x: 12;
+    --open-gap: 12;
+  }
+  .journey-head,
+  .journey-listbox,
+  .journey-media {
+    position: relative;
+    inset: auto;
+    width: auto;
+  }
+  .journey-head {
+    flex: none;
+    padding: calc(28 * var(--s)) calc(20 * var(--s)) 0;
+  }
+  .journey-media {
+    flex: none;
+    height: 30svh;
+    margin-top: calc(16 * var(--s));
+  }
+  .journey-listbox {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: calc(16 * var(--s)) calc(20 * var(--s)) 0;
+  }
+}
+
+/* ---- Heading ------------------------------------------------------- */
+
+.journey-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: calc(var(--title) * var(--s));
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  color: var(--color-secondary);
+}
+.journey-title span {
+  display: block;
+}
+.journey-sub {
+  margin-top: calc(var(--head-gap) * var(--s));
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(13px, calc(var(--sub) * var(--s)));
+  line-height: var(--sub-lh);
+  color: var(--color-gray-70);
+}
+
+/* ---- Right panel --------------------------------------------------- */
+
+.journey-media video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Until the motion video exists, the panel names the open stage. */
+.journey-now {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+.journey-now-count {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--color-gray-70);
+}
+.journey-now-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: clamp(24px, calc(44 * var(--s)), 56px);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: var(--color-secondary);
+}
+@media (aspect-ratio <= 1) {
+  .journey-now-title {
+    font-size: calc(30 * var(--s));
+  }
+}
+.journey-now > * {
+  animation: journey-now 360ms ease both;
+}
+@keyframes journey-now {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+/* ---- Stage list ---------------------------------------------------- */
+
+.journey-list {
+  display: flex;
+  gap: calc(var(--track-gap) * var(--s));
+  width: fit-content;
+  translate: 0 calc(-1px * var(--shift, 0)); /* portrait only: keeps the open stage in view */
+}
+
+.journey-track {
+  position: relative;
+  flex: none;
+  width: 2px;
+  background: var(--color-gray-20);
+}
+.journey-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-gray-70);
+  transform-origin: 50% 0;
+  scale: 1 var(--fill, 0);
+}
+
+.journey-steps {
+  position: relative; /* stage offsets are measured from here (Journey.jsx) */
+  width: calc(var(--list-w) * var(--s));
+}
+/* Dividers sit between stages only. The border takes its pixel out of the gap, as Figma's 0-height line does. */
+.journey-step + .journey-step {
+  margin-top: calc(var(--step-gap) * var(--s));
+  padding-top: calc(var(--step-gap) * var(--s) - 1px);
+  border-top: 1px solid rgb(0 0 0 / 0.2);
+}
+
+/* Each stage is a button: clicking one jumps the bar there. */
+.journey-card {
+  --ease-open: cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  transition:
+    padding 380ms var(--ease-open),
+    gap 380ms var(--ease-open);
+}
+.journey-icon {
+  flex: none;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  background: #d9d9d9;
+  object-fit: contain;
+  transition:
+    width 380ms var(--ease-open),
+    height 380ms var(--ease-open),
+    opacity 240ms ease;
+}
+.journey-card:focus-visible {
+  outline-offset: 4px;
+}
+img.journey-icon {
+  background: none; /* a custom icon draws itself; only the stand-in square needs the grey */
+}
+.journey-text {
+  flex: 1;
+  min-width: 0;
+}
+/* The stage's line of copy only shows while it is open. */
+.journey-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 380ms var(--ease-open),
+    opacity 240ms ease;
+}
+.journey-more > * {
+  overflow: hidden;
+}
+
+.journey-step[aria-current] .journey-card {
+  gap: calc(var(--open-gap) * var(--s));
+  padding: calc(var(--open-pad-y) * var(--s)) calc(var(--open-pad-x) * var(--s));
+}
+.journey-step[aria-current] .journey-icon {
+  width: calc(var(--icon) * var(--s));
+  height: calc(var(--icon) * var(--s));
+  opacity: 1;
+}
+.journey-step[aria-current] .journey-more {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.journey-step-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: max(14px, calc(var(--step-title) * var(--s)));
+  line-height: 1.4; /* 28px */
+  letter-spacing: -0.01em;
+  color: #000;
+}
+.journey-step-body {
+  padding-top: calc(2 * var(--s));
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(13px, calc(var(--step-body) * var(--s)));
+  line-height: 1.5; /* 24px */
+  letter-spacing: -0.025em;
+  color: rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-card,
+  .journey-icon,
+  .journey-more {
+    transition: none;
+  }
+  .journey-now > * {
+    animation: none;
+  }
+}

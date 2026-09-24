@@ -1,0 +1,60 @@
+/* Modal player for a client story video (StoryPlayer.jsx). Used by the testimonials and contractor sections. */
+
+.story-player {
+  margin: auto;
+  padding: 0;
+  width: min(92vw, 78vh, 720px);
+  max-width: none;
+  max-height: none;
+  background: var(--color-secondary);
+  color: var(--color-white);
+  overflow: visible;
+}
+.story-player::backdrop {
+  background: rgb(29 32 36 / 0.92);
+}
+.story-player video,
+.story-player iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 0;
+  background: #000;
+}
+/* YouTube episodes are 16:9. */
+.story-player[data-wide] {
+  width: min(92vw, calc(78vh * 16 / 9), 1100px);
+}
+.story-player[data-wide] iframe {
+  aspect-ratio: 16 / 9;
+}
+.story-player-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0 0;
+  background: transparent;
+}
+.story-player-name {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+.story-player-close {
+  padding: 10px 16px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 16px;
+  background: #3d4045;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+.story-player-close:hover {
+  background: #4d4e51;
+}
+.story-player-close:focus-visible {
+  outline-color: var(--color-white);
+}

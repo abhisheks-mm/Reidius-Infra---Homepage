@@ -1,0 +1,118 @@
+/* ---------------------------------------------------------------
+   Truth: Figma 504:2905, a 1500 × 930 frame on white. Static.
+   Centred headline and line; below, the episode thumbnail (1115 × 623) with the Watch button 32 in from its
+   right edge and 40 up from its bottom. The whole thumbnail plays the episode.
+   Sizes are Figma px times --s, like the other sections.
+---------------------------------------------------------------- */
+
+.truth {
+  position: relative;
+  background: var(--color-white);
+  color: var(--color-secondary);
+  container: truth / inline-size;
+
+  --W: 1500;
+  --H: 900;
+  --s: min(100cqw / var(--W), 100vh / var(--H));
+
+  /* for the shared Watch button (.story-watch in testimonials.css) */
+  --btn: 18;
+  --watch-right: 32;
+  --watch-bottom: 40;
+}
+
+.truth-inner {
+  padding: calc(48 * var(--s)) 0;
+}
+
+.truth-head {
+  width: calc(886 * var(--s));
+  margin-inline: auto;
+  text-align: center;
+}
+.truth-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: calc(52 * var(--s)); /* Roboto Slab 700, 1.2, -4% */
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
+.truth-sub {
+  margin-top: calc(16 * var(--s));
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(14px, calc(18 * var(--s))); /* Switzer 400, 18/26, 80% */
+  line-height: 1.4444;
+  color: rgb(29 32 36 / 0.8);
+}
+
+.truth-media {
+  position: relative;
+  display: block;
+  width: calc(1115 * var(--s));
+  aspect-ratio: 1115 / 623;
+  margin: calc(45 * var(--s)) auto 0; /* the thumbnail's top sits at 259 */
+  padding: 0;
+  overflow: hidden;
+  background: var(--color-gray-20);
+  cursor: pointer;
+}
+.truth-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: scale 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.truth-media .story-watch {
+  right: calc(var(--watch-right) * var(--s));
+  bottom: calc(var(--watch-bottom) * var(--s));
+}
+@media (hover: hover) {
+  .truth-media:hover img {
+    scale: 1.02;
+  }
+  .truth-media:hover .story-watch {
+    background: var(--color-white);
+    color: var(--color-secondary);
+  }
+}
+.truth-media:focus-visible {
+  outline-offset: 4px;
+}
+.truth-media:focus-visible .story-watch {
+  background: var(--color-white);
+  color: var(--color-secondary);
+}
+
+@media (aspect-ratio <= 1) {
+  .truth {
+    --W: 390;
+    --H: 844;
+    --btn: 15;
+    --watch-right: 12;
+    --watch-bottom: 12;
+  }
+  .truth-inner {
+    padding: calc(64 * var(--s)) 0;
+  }
+  .truth-head,
+  .truth-media {
+    width: calc(350 * var(--s));
+  }
+  .truth-title {
+    font-size: calc(28 * var(--s));
+    text-wrap: balance;
+  }
+  .truth-sub {
+    font-size: calc(16 * var(--s));
+  }
+  .truth-media {
+    margin-top: calc(28 * var(--s));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .truth-media img {
+    transition: none;
+  }
+}

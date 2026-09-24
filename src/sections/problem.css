@@ -1,0 +1,285 @@
+/* ---------------------------------------------------------------
+   Problem → solution: Figma "3rd section" (500:2149), five frames of one scroll animation.
+     1 (499:1713)  the two boxes sit at the screen edges
+     2 (500:1965)  they slide together and meet
+     3–5          the people chips stream through "Building your own"; they vanish at the yellow edge,
+                   and one dark chip comes out of it and settles in the middle of "Building with Reidius"
+   No pinning: the section scrolls normally and the animation is scrubbed while it does, finishing as the
+   section's bottom reaches the bottom of the screen (Problem.jsx). Three progress values drive it:
+     --pb boxes meet · --pc chips flow · --pd dark chip settles
+   Sizes are Figma px times --s, the same screen scale as the other sections.
+---------------------------------------------------------------- */
+
+.problem {
+  position: relative;
+  background: var(--color-gray-20);
+  container: problem / inline-size;
+  overflow: hidden;
+  overflow: clip;
+
+  --pb: 0;
+  --pc: 0;
+  --pd: 0;
+
+  --W: 1500;
+  --H: 900;
+  --s: min(100cqw / var(--W), 100vh / var(--H));
+  --frame-x: calc((100cqw - var(--W) * var(--s)) / 2);
+
+  /* Heading (499:1714) */
+  --head-x: 80;
+  --head-top: 91;
+  --head-w: 773;
+  --title: 48; /* Roboto Slab 500, 1.2, -4% */
+  --sub: 18; /* Switzer 400, 18/26 */
+  --sub-lh: 1.4444;
+  --sub-w: 507;
+  --head-gap: 16;
+
+  /* Boxes: 670 × 320, 355 from the top. Frame 1 has them flush with the screen edges, frame 2 meeting. */
+  --own-x: 80;
+  --own-top: 355;
+  --own-w: 670;
+  --own-h: 320;
+  --own-from-x: calc(-1 * (var(--frame-x) + var(--own-x) * var(--s))); /* to the left screen edge */
+  --own-from-y: 0;
+  --us-x: 750;
+  --us-top: 355;
+  --us-w: 670;
+  --us-h: 320;
+  --us-from-x: calc(100cqw - var(--us-w) * var(--s) - var(--frame-x) - var(--us-x) * var(--s)); /* right edge */
+  --us-from-y: 0;
+
+  /* Box labels: Roboto Slab 600 15/24, caps, 24 from the top. The band behind each label hides chips passing under it. */
+  --label: 15;
+  --label-top: 24;
+  --band: 60;
+
+  /* People chips: Switzer 500 15/24, padding 11/44. The cluster (710 × 182) sits 95 into the white box
+     and travels from x −714 (frames 1–2, out of sight) to 586 (frame 5). */
+  --chip: 15;
+  --chip-lh: 1.6;
+  --chip-py: 0.7333em;
+  --chip-px: 2.9333em;
+  --flow-left: 0;
+  --flow-top: 95;
+  --flow-x-a: -714;
+  --flow-x-b: 586;
+  --flow-y-a: 0;
+  --flow-y-b: 0;
+  --still: 0.534; /* reduced motion: the flow position that shows every chip in the box */
+
+  /* Dark chip: 46 tall, centre 26 below the box's middle; from x −255 (hidden) to 208 (centred).
+     Starts at −270: the browser sets it a couple of px wider than Figma, and −255 would leave a sliver showing. */
+  --ans-top: 163;
+  --ans-x-a: -270;
+  --ans-x-b: 208;
+  --ans-y-a: 0;
+  --ans-y-b: 0;
+}
+
+/* Portrait screens: a 390 × 844 frame. The boxes stack, white over yellow, and the flow runs downward. */
+@media (aspect-ratio <= 1) {
+  .problem {
+    --W: 390;
+    --H: 844;
+
+    --head-x: 20;
+    --head-top: 64;
+    --head-w: 350;
+    --title: 30;
+    --sub: 16;
+    --sub-lh: 1.5;
+    --sub-w: 350;
+    --head-gap: 12;
+
+    --own-x: 20;
+    --own-top: 300;
+    --own-w: 350;
+    --own-h: 250;
+    --own-from-y: -20;
+    --us-x: 20;
+    --us-top: 550;
+    --us-w: 350;
+    --us-h: 200;
+    --us-from-y: 20;
+
+    --label-top: 20;
+    --band: 56;
+
+    --chip: 13;
+    --chip-lh: 1.5385; /* 20px */
+    --chip-py: 0.5385em; /* 7px */
+    --chip-px: 1.2308em; /* 16px */
+    --flow-left: 20;
+    --flow-top: 0;
+    --flow-x-a: 0;
+    --flow-x-b: 0;
+    --flow-y-a: -120;
+    --flow-y-b: 210;
+    --still: 0.576;
+
+    --ans-top: 0;
+    --ans-x-a: 48;
+    --ans-x-b: 48;
+    --ans-y-a: -56;
+    --ans-y-b: 105;
+  }
+}
+
+.problem-inner {
+  position: relative;
+  height: calc(var(--H) * var(--s));
+}
+
+/* Where the scrubbed animation starts: the top of the boxes entering the screen. */
+.problem-mark {
+  position: absolute;
+  top: calc(var(--own-top) * var(--s));
+  left: 0;
+  width: 1px;
+  height: 1px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ---- Heading ------------------------------------------------------- */
+
+.problem-head {
+  position: absolute;
+  left: calc(var(--frame-x) + var(--head-x) * var(--s));
+  top: calc(var(--head-top) * var(--s));
+  width: calc(var(--head-w) * var(--s));
+}
+.problem-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: calc(var(--title) * var(--s));
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  color: var(--color-secondary);
+  text-wrap: balance;
+}
+.problem-sub {
+  margin-top: calc(var(--head-gap) * var(--s));
+  max-width: calc(var(--sub-w) * var(--s));
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(14px, calc(var(--sub) * var(--s)));
+  line-height: var(--sub-lh);
+  color: var(--color-gray-70);
+}
+
+/* ---- Boxes --------------------------------------------------------- */
+
+.problem-box {
+  position: absolute;
+  overflow: hidden;
+  overflow: clip;
+  box-shadow: 0 1px 16px rgb(0 0 0 / 0.04);
+}
+.problem-own {
+  left: calc(var(--frame-x) + var(--own-x) * var(--s));
+  top: calc(var(--own-top) * var(--s));
+  width: calc(var(--own-w) * var(--s));
+  height: calc(var(--own-h) * var(--s));
+  background: var(--color-white);
+  translate: calc(var(--own-from-x) * (1 - var(--pb))) calc(var(--own-from-y) * var(--s) * (1 - var(--pb)));
+}
+.problem-us {
+  left: calc(var(--frame-x) + var(--us-x) * var(--s));
+  top: calc(var(--us-top) * var(--s));
+  width: calc(var(--us-w) * var(--s));
+  height: calc(var(--us-h) * var(--s));
+  background: var(--color-primary);
+  translate: calc(var(--us-from-x) * (1 - var(--pb))) calc(var(--us-from-y) * var(--s) * (1 - var(--pb)));
+}
+
+.problem-label {
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 auto;
+  height: calc(var(--band) * var(--s));
+  padding-top: calc(var(--label-top) * var(--s));
+  background: inherit;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: max(12px, calc(var(--label) * var(--s)));
+  line-height: 1.6; /* 24px */
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+/* ---- People chips -------------------------------------------------- */
+
+.problem-people {
+  position: absolute;
+  left: calc(var(--flow-left) * var(--s));
+  top: calc(var(--flow-top) * var(--s));
+  translate:
+    calc((var(--flow-x-a) + (var(--flow-x-b) - var(--flow-x-a)) * var(--pc)) * var(--s))
+    calc((var(--flow-y-a) + (var(--flow-y-b) - var(--flow-y-a)) * var(--pc)) * var(--s));
+}
+.problem-chip {
+  --at-x: var(--wide-x);
+  --at-y: var(--wide-y);
+  position: absolute;
+  left: calc(var(--at-x) * var(--s));
+  top: calc(var(--at-y) * var(--s));
+  padding: var(--chip-py) var(--chip-px);
+  background: var(--color-gray-20);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: max(11px, calc(var(--chip) * var(--s)));
+  line-height: var(--chip-lh);
+  letter-spacing: -0.02em;
+  color: var(--color-secondary);
+  white-space: nowrap;
+}
+@media (aspect-ratio <= 1) {
+  .problem-chip {
+    --at-x: var(--tall-x);
+    --at-y: var(--tall-y);
+  }
+}
+
+/* ---- The one chip that comes out the other side ---------------------- */
+
+.problem-answer {
+  position: absolute;
+  left: 0;
+  top: calc(var(--ans-top) * var(--s));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5333em; /* 8px */
+  height: 3.0667em; /* 46px */
+  padding: 0 2.9333em; /* 44px */
+  background: var(--color-secondary);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: max(12px, calc(15 * var(--s)));
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  translate:
+    calc((var(--ans-x-a) + (var(--ans-x-b) - var(--ans-x-a)) * var(--pd)) * var(--s))
+    calc((var(--ans-y-a) + (var(--ans-y-b) - var(--ans-y-a)) * var(--pd)) * var(--s));
+}
+.problem-answer img {
+  width: 1.3643em; /* 20.46px */
+  height: auto;
+}
+.problem-answer strong {
+  font-weight: 600;
+}
+
+/* Reduced motion: no scrubbing. Boxes together, every chip in view, the answer in place. */
+@media (prefers-reduced-motion: reduce) {
+  .problem {
+    --pb: 1;
+    --pc: var(--still);
+    --pd: 1;
+  }
+}
