@@ -28,8 +28,6 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    /* Keeps the layout still when a section holds the page and the scrollbar hides (Journey.jsx). */
-    scrollbar-gutter: stable;
   }
   body {
     background: var(--color-white);

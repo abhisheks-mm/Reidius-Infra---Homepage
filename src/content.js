@@ -84,27 +84,67 @@ export const contractor = {
   video: '',
 }
 
-// Figma 500:2722 ("10 steps"). As the page scrolls, a progress bar runs down the stages; the stage it reaches
-// opens up with its icon, and the right-hand panel (a full screen tall) shows that stage.
-// `video`: the motion video for the right panel, scrubbed across the 10 stages (not made yet).
-// `icon` per stage: the custom icons (not made yet; a grey square stands in).
-// DRAFT copy: Figma's stage lines are template text ("Creating wireframes and mockups", "fixing bugs"),
-// so each stage has a one-line draft (it must fit 373px, the text width of an open stage). Confirm with the client.
+// Figma 516:936 ("10 step process", replaces 500:2722): five phases; the open one shows a card, a line and
+// four points, and the right panel shows its visual. The phases play one after another on their own while
+// the section is on screen; scrolling is never held.
+// Figma gives the copy and visual for "Visit & Understand" only. The other four phases' lines and points are
+// DRAFTS built from the live site's wording (confirm with the client), and they show phase 1's visual until
+// their own arrive: set `visual` (an image) or `video` (a short loop) per phase.
 export const journey = {
   titleLines: ['One Partner For Your', 'Entire Home Journey'],
   sub: '10 stages, each signed off with you before the next one starts.',
-  video: '',
-  steps: [
-    { title: 'Client Consultation', body: 'We visit your plot and hear what you need.', icon: '' },
-    { title: 'Feasibility Study', body: 'Plot, rules and budget checked before design.', icon: '' },
-    { title: 'Project Design', body: 'See your home in 3D before a brick is laid.', icon: '' },
-    { title: 'Cost Estimation', body: 'A line-item estimate at wholesale rates.', icon: '' },
-    { title: 'Material Sourcing', body: 'Bought direct, with every bill on your app.', icon: '' },
-    { title: 'Construction Scheduling', body: 'A project manager runs your site every day.', icon: '' },
-    { title: 'Project Finalizing', body: 'Finishes and fittings, checked one by one.', icon: '' },
-    { title: 'Client Walkthrough', body: 'Walk your home with us before the handover.', icon: '' },
-    { title: 'Client Survey', body: 'Tell us what worked and what didn’t.', icon: '' },
-    { title: 'Feedback', body: 'Your 2 years of free maintenance start here.', icon: '' },
+  phases: [
+    {
+      title: 'Visit & Understand',
+      line: 'Understand → Design → Approve',
+      points: [
+        'Visit the site and assess the location',
+        'Study site conditions, requirements & possibilities',
+        'Understand your needs, lifestyle & budget',
+        'Conduct a feasibility study before design',
+      ],
+      visual: '/journey/visit.webp',
+    },
+    {
+      title: 'Design & Plan',
+      line: 'Layout → 3D → Estimate',
+      points: [
+        'Plan the layout around your plot and your family',
+        'See your home in 3D before a brick is laid',
+        'Get a line-item estimate at wholesale rates',
+        'Approvals and permits handled for you',
+      ],
+    },
+    {
+      title: 'Build Your Home',
+      line: 'Source → Build → Update',
+      points: [
+        'Materials bought direct, every bill on your app',
+        'One project manager runs your site',
+        'A report every evening, with photos',
+        'A site camera you can open any time',
+      ],
+    },
+    {
+      title: 'Check Every Detail',
+      line: 'Inspect → Fix → Sign off',
+      points: [
+        'Each stage inspected against our checklist',
+        'Anything off is fixed before the next stage',
+        'Finishes and fittings checked one by one',
+        'Walk your home with us before handover',
+      ],
+    },
+    {
+      title: 'Handover Your Home',
+      line: 'Keys → Documents → Care',
+      points: [
+        'Keys and every document handed over',
+        '2 years of free maintenance after handover',
+        'A short survey on how each stage went',
+        'One number to call after you move in',
+      ],
+    },
   ],
 }
 
