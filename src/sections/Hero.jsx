@@ -1,18 +1,22 @@
 import { useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { createFilm } from './heroFilm'
 import './hero.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-/* Scroll scene, Figma frame A → frame B. Geometry lives in hero.css; this file only moves two numbers.
-   Windows are fractions of the A → B scroll distance (0 = page top, 1 = frame B reached). */
+/* Scroll scene: Figma frame A → frame B, then the film (heroFilm.js) from the homeowner's call to his finished
+   home. Geometry lives in hero.css; this file moves a few numbers.
+   A → B windows are fractions of the A → B scroll distance (0 = page top, 1 = frame B reached). */
 const SCENE = {
   copy: [0, 0.72], // --p: headline and paragraph shrink and rise
-  picture: [0.08, 0.9], // --q: person steps closer, sky settles, wash thins
+  picture: [0.08, 0.84], // --q: person steps closer, sky settles, wash thins
+  film: [0.86, 1], // the film fades in over the person once he is at frame B, where its first frame matches him
   scrub: 0.8, // seconds the scene takes to catch up with the scrollbar
+  filmScrub: 1, // the same for the film; a touch longer, so it glides
   ease: 'power1.inOut',
-  cover: { scale: 0.94, shade: 0.55 }, // where frame B ends up while the testimonials slide over it
+  cover: { scale: 0.94, shade: 0.55 }, // where the film's last frame ends up while the testimonials slide over it
 }
 
 /* One entrance on first paint: the copy settles in, then the person rises into frame. */
@@ -41,6 +45,8 @@ export default function Hero() {
     const mm = gsap.matchMedia()
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const mark = (name) => section.querySelector(`[data-mark="${name}"]`)
+      const filmLayer = section.querySelector('.hero-film')
+      const film = createFilm(filmLayer.querySelector('canvas'), scene)
       const tl = gsap.timeline({
         scrollTrigger: { trigger: section, start: 'top top', endTrigger: mark('scene'), end: 'top top', scrub: SCENE.scrub },
       })
@@ -49,11 +55,29 @@ export default function Hero() {
         tl.fromTo(scene, { [prop]: 0 }, { [prop]: 1, ease: SCENE.ease, duration: to - from }, from)
       run('--p', SCENE.copy)
       run('--q', SCENE.picture)
+      // In the same timeline as --q, so the film can only fade in after the person has reached frame B
+      tl.fromTo(filmLayer, { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none', duration: SCENE.film[1] - SCENE.film[0] }, SCENE.film[0])
 
-      // Once frame B is reached, the testimonials slide up over it; the scene recedes and darkens.
+      // Frame B → the film's last frame, with a progress line along the bottom
+      const clip = { frame: 0 }
       gsap
         .timeline({
-          scrollTrigger: { trigger: mark('scene'), start: 'top top', endTrigger: mark('cover'), end: 'top top', scrub: true },
+          scrollTrigger: { trigger: mark('scene'), start: 'top top', endTrigger: mark('film'), end: 'top top', scrub: SCENE.filmScrub },
+        })
+        .to(clip, { frame: film.last, ease: 'none', duration: 1, onUpdate: () => film.show(clip.frame) }, 0)
+        .fromTo(scene, { '--vp': 0 }, { '--vp': 1, ease: 'none', duration: 1 }, 0)
+      film.show(0)
+
+      // The stills load once the page itself has (hero image, fonts), or on the first scroll, whichever is first
+      const startFilm = () => film.load()
+      if (document.readyState === 'complete') startFilm()
+      else window.addEventListener('load', startFilm, { once: true })
+      window.addEventListener('scroll', startFilm, { once: true, passive: true })
+
+      // After the film, the testimonials slide up over it; the scene recedes and darkens.
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: mark('film'), start: 'top top', endTrigger: mark('cover'), end: 'top top', scrub: true },
         })
         .fromTo(scene, { scale: 1 }, { scale: SCENE.cover.scale, transformOrigin: '50% 0%', ease: 'none' }, 0)
         .fromTo(section.querySelector('.hero-shade'), { opacity: 0 }, { opacity: SCENE.cover.shade, ease: 'none' }, 0)
@@ -69,6 +93,9 @@ export default function Hero() {
       })
       return () => {
         cancelled = true
+        window.removeEventListener('load', startFilm)
+        window.removeEventListener('scroll', startFilm)
+        film.destroy()
       }
     })
 
@@ -88,7 +115,6 @@ export default function Hero() {
           />
         </div>
         <div className="hero-wash" aria-hidden />
-        {/* The client plans to turn this picture into a video later. */}
         <div className="hero-person" aria-hidden>
           <img
             data-intro="person"
@@ -98,6 +124,14 @@ export default function Hero() {
             alt=""
             fetchPriority="high"
           />
+        </div>
+        {/* The film (heroFilm.js), faded in over the person once he reaches frame B */}
+        <div className="hero-film" aria-hidden>
+          <canvas />
+          <div className="hero-veil" />
+          <div className="hero-progress">
+            <span />
+          </div>
         </div>
 
         <div className="hero-copy">
@@ -118,6 +152,7 @@ export default function Hero() {
         <div className="hero-shade" aria-hidden />
       </div>
       <span className="hero-mark" data-mark="scene" aria-hidden />
+      <span className="hero-mark" data-mark="film" aria-hidden />
       <span className="hero-mark" data-mark="cover" aria-hidden />
     </section>
   )

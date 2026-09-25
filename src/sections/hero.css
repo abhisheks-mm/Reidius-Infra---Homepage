@@ -8,19 +8,21 @@
    All positions are in Figma px, multiplied by --s (one Figma px on this screen).
 
    Scroll budget while the scene is pinned, top to bottom:
-     --hero-scroll  frame A → frame B
-     100lvh         the testimonials slide up over frame B (testimonials.css pulls itself up by 100lvh)
+     --hero-scroll  frame A → frame B; at the end the film fades in over the person (they match exactly)
+     --film-scroll  the film, drawn on a canvas by heroFilm.js: the homeowner's call → his finished home
+     100lvh         the testimonials slide up over the film's last frame (testimonials.css pulls itself up by 100lvh)
 ---------------------------------------------------------------- */
 
 .hero {
   --hero-scroll: 90vh;
+  --film-scroll: 360vh;
   position: relative;
-  height: calc(100vh + var(--hero-scroll) + 100vh);
-  height: calc(100lvh + var(--hero-scroll) + 100lvh);
+  height: calc(100vh + var(--hero-scroll) + var(--film-scroll) + 100vh);
+  height: calc(100lvh + var(--hero-scroll) + var(--film-scroll) + 100lvh);
   background: var(--color-secondary); /* shows round the scene as it recedes under the next section */
 }
 
-/* Markers for ScrollTrigger: where A → B ends and where the cover ends. */
+/* Markers for ScrollTrigger: where A → B ends, where the film ends and where the cover ends. */
 .hero-mark {
   position: absolute;
   left: 0;
@@ -32,12 +34,15 @@
 .hero-mark[data-mark='scene'] {
   top: var(--hero-scroll);
 }
+.hero-mark[data-mark='film'] {
+  top: calc(var(--hero-scroll) + var(--film-scroll));
+}
 .hero-mark[data-mark='cover'] {
-  top: calc(var(--hero-scroll) + 100vh);
-  top: calc(var(--hero-scroll) + 100lvh);
+  top: calc(var(--hero-scroll) + var(--film-scroll) + 100vh);
+  top: calc(var(--hero-scroll) + var(--film-scroll) + 100lvh);
 }
 
-/* Darkens frame B as the next section covers it. */
+/* Darkens the film's last frame as the next section covers it. */
 .hero-shade {
   position: absolute;
   inset: 0;
@@ -84,7 +89,9 @@
   --cta-gap: 20;
   --cta: 18; /* Fustat 700 18/25, the same in both frames */
 
-  /* Person (498:1159 → 498:1169): a square cut-out, centred, running off the bottom edge */
+  /* Person (498:1159 → 498:1169): a square cut-out, centred, running off the bottom edge.
+     Frame B is only the fallback: heroFilm.js sets --pb-size / --pb-top / --pb-dx to where the homeowner
+     stands in the film's first frame on this screen (within a few px of Figma's B on a 5:3 screen). */
   --person-a: 494;
   --person-b: 644;
   --person-top-a: 481;
@@ -108,6 +115,7 @@
 @media (aspect-ratio <= 1) {
   .hero {
     --hero-scroll: 70vh;
+    --film-scroll: 280vh;
   }
   .hero-scene {
     --W: 390;
@@ -127,9 +135,9 @@
     --cta-gap: 22;
     --cta: 16;
 
-    --person-a: 440;
+    --person-a: 420; /* frame B comes from the film: 1.32 × the screen width, head just under the copy */
     --person-b: 540;
-    --person-top-a: 450;
+    --person-top-a: 430;
     --person-top-b: 320;
 
     --sky-w: 1488; /* 1488 × 1239; frame B keeps its bottom edge below 844 */
@@ -191,22 +199,65 @@
   );
 }
 
-/* Laid out at its frame-B size and position; frame A is the same box scaled down from its top centre. */
+/* Frame A is Figma's box; frame B is the film's first frame on this screen (set by heroFilm.js). */
 .hero-person {
+  --a-size: calc(var(--person-a) * var(--s));
+  --a-top: calc(var(--top) + var(--person-top-a) * var(--s));
+  --b-size: var(--pb-size, calc(var(--person-b) * var(--s)));
+  --b-top: var(--pb-top, calc(var(--top) + var(--person-top-b) * var(--s)));
   position: absolute;
-  left: 50%;
-  top: calc(var(--top) + var(--person-top-b) * var(--s));
-  width: calc(var(--person-b) * var(--s));
+  left: calc(50% + var(--pb-dx, 0px) * var(--q));
+  top: calc(var(--a-top) + (var(--b-top) - var(--a-top)) * var(--q));
+  width: calc(var(--a-size) + (var(--b-size) - var(--a-size)) * var(--q));
   aspect-ratio: 1;
-  transform-origin: 50% 0;
-  translate: -50% calc((var(--person-top-a) - var(--person-top-b)) * var(--s) * (1 - var(--q)));
-  scale: calc((var(--person-a) + (var(--person-b) - var(--person-a)) * var(--q)) / var(--person-b));
+  translate: -50% 0;
   pointer-events: none;
 }
 .hero-person img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* ---- Film ---------------------------------------------------------- */
+
+/* Above the picture layers, under the copy. Hero.jsx fades it in; the canvas covers the whole scene. */
+.hero-film {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.hero-film canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Keeps the copy legible over the film's sky; ends above the homeowner's head */
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.7) 0%,
+    rgb(255 255 255 / 0.32) 18%,
+    rgb(255 255 255 / 0) 34%
+  );
+}
+/* How far through the film: a thin line along the bottom edge */
+.hero-progress {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: rgb(255 255 255 / 0.28);
+}
+.hero-progress span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  transform-origin: 0 50%;
+  scale: var(--vp, 0) 1;
 }
 
 /* ---- Copy ---------------------------------------------------------- */
@@ -263,12 +314,15 @@
   }
 }
 
-/* Reduced motion: no pinning. The hero is a single 100vh screen showing frame A. */
+/* Reduced motion: no pinning and no film. The hero is a single 100vh screen showing frame A. */
 @media (prefers-reduced-motion: reduce) {
   .hero {
     height: auto;
   }
   .hero-scene {
     position: relative;
+  }
+  .hero-film {
+    display: none;
   }
 }
