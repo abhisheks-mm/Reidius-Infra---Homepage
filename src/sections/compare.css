@@ -1,0 +1,246 @@
+/* ---------------------------------------------------------------
+   Compare: Figma 530:1058, a 1440 × 1024 frame on white. Static.
+   Centred headline; then the topic labels on the left (x 120) and the comparison (x 323, 973 wide, #f2f2f2,
+   16 padding): the typical contractor's column (387) and Reidius Infra's white card, with its yellow checklist
+   underneath. Five rows, 50 apart; thin rules between them run under the labels and across both columns.
+   Sizes are Figma px times --s, like the other sections.
+---------------------------------------------------------------- */
+
+.cmp {
+  position: relative;
+  background: var(--color-white);
+  container: cmp / inline-size;
+
+  --W: 1440;
+  --H: 900;
+  --s: min(100cqw / var(--W), 100vh / var(--H));
+  --frame-x: calc((100cqw - var(--W) * var(--s)) / 2);
+}
+
+.cmp-inner {
+  padding: calc(32 * var(--s)) 0 calc(45 * var(--s));
+}
+
+.cmp-title {
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: calc(52 * var(--s)); /* Roboto Slab 400, 1.2, -4% */
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  color: #030c14;
+}
+.cmp-title span,
+.cmp-label span,
+.cmp-col-title span {
+  display: block;
+}
+
+/* ---- The table ------------------------------------------------------- */
+
+.cmp-table {
+  position: relative;
+  display: flex;
+  width: calc(973 * var(--s));
+  margin: calc(44.2 * var(--s)) 0 0 calc(var(--frame-x) + 323 * var(--s)); /* top at 201 */
+  padding: calc(16 * var(--s));
+  background: var(--color-gray-20);
+}
+
+.cmp-col,
+.cmp-card {
+  display: flex;
+  flex-direction: column;
+  gap: calc(40 * var(--s));
+  padding: calc(32 * var(--s));
+}
+.cmp-them {
+  flex: none;
+  width: calc(387 * var(--s));
+}
+.cmp-us {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.cmp-card {
+  background: var(--color-white);
+  filter: drop-shadow(0 0 10px rgb(0 0 0 / 0.08));
+}
+
+/* Column header: a 48 badge and a two-line label (Switzer 600, 14/18, caps, -4%) */
+.cmp-head {
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--s));
+}
+.cmp-badge {
+  flex: none;
+  width: max(36px, calc(48 * var(--s)));
+  aspect-ratio: 1;
+  background: #e0e0e0;
+}
+.cmp-label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: max(12px, calc(14 * var(--s)));
+  line-height: 1.2857;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: #000;
+}
+.cmp-col-title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: calc(40 * var(--s)); /* Roboto Slab 400, 40/44, -4% */
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: #000;
+}
+
+/* Rows: Switzer 17/26, -4%; the typical column in 400, ours in 500 */
+.cmp-rows {
+  display: grid;
+  gap: calc(24 * var(--s));
+}
+.cmp-rows li {
+  font-family: var(--font-body);
+  font-size: max(14px, calc(17 * var(--s)));
+  line-height: 1.5294;
+  letter-spacing: -0.04em;
+  color: var(--color-secondary);
+}
+.cmp-them .cmp-rows li {
+  font-weight: 400;
+}
+.cmp-us .cmp-rows li,
+.cmp-extras li {
+  font-weight: 500;
+}
+/* Each cell names its topic for screen readers; on portrait screens it shows above the cell
+   (the colon stays for screen readers only). */
+.cmp-topic,
+.cmp-colon {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cmp-extras {
+  display: grid;
+  gap: calc(24 * var(--s));
+  padding: calc(32 * var(--s));
+  background: #f9ef63;
+  filter: drop-shadow(0 0 10px rgb(0 0 0 / 0.08));
+}
+.cmp-extras li {
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--s));
+  font-family: var(--font-body);
+  font-size: max(14px, calc(17 * var(--s)));
+  line-height: 1.5294;
+  letter-spacing: -0.04em;
+  color: var(--color-secondary);
+}
+.cmp-extras img {
+  flex: none;
+  width: max(20px, calc(24 * var(--s)));
+  height: auto;
+}
+
+/* ---- Topic labels and rules (wide screens) ------------------------------- */
+
+/* Labels sit 8 below their row (Figma: 473 vs 465), in a 159 column 191 left of the table. */
+.cmp-topics {
+  position: absolute;
+  left: calc(-191 * var(--s));
+  top: calc(272 * var(--s));
+  width: calc(159 * var(--s));
+  display: grid;
+  gap: calc(24 * var(--s));
+}
+.cmp-topics li {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: max(11px, calc(13 * var(--s))); /* Switzer 500, 13/26, caps, -1% */
+  line-height: 2;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-gray-70);
+  white-space: nowrap;
+}
+/* Rules between the rows, from the labels' left edge to the table's inner right edge. */
+.cmp-rule {
+  position: absolute;
+  z-index: 1;
+  left: calc(-203 * var(--s));
+  width: calc(1160 * var(--s));
+  height: 1px;
+  background: #e1e1e1;
+  pointer-events: none;
+}
+
+/* ---- Portrait screens: the two columns stack, each cell labelled with its topic ---- */
+@media (aspect-ratio <= 1) {
+  .cmp {
+    --W: 390;
+    --H: 844;
+  }
+  .cmp-inner {
+    padding: calc(64 * var(--s)) 0;
+  }
+  .cmp-title {
+    font-size: calc(30 * var(--s));
+  }
+  .cmp-table {
+    flex-direction: column;
+    width: auto;
+    margin: calc(28 * var(--s)) calc(var(--frame-x) + 20 * var(--s)) 0;
+    padding: calc(10 * var(--s));
+  }
+  .cmp-them {
+    width: auto;
+  }
+  .cmp-col,
+  .cmp-card {
+    gap: calc(24 * var(--s));
+    padding: calc(20 * var(--s));
+  }
+  .cmp-extras {
+    gap: calc(16 * var(--s));
+    padding: calc(20 * var(--s));
+  }
+  .cmp-col-title {
+    font-size: calc(30 * var(--s));
+  }
+  .cmp-rows {
+    gap: 0;
+  }
+  .cmp-rows li {
+    padding: calc(12 * var(--s)) 0;
+    border-top: 1px solid #e1e1e1;
+  }
+  .cmp-topic {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.6;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--color-gray-70);
+  }
+  .cmp-topics,
+  .cmp-rule {
+    display: none;
+  }
+}

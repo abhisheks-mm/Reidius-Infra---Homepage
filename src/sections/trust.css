@@ -1,89 +1,157 @@
 /* ---------------------------------------------------------------
-   Trust: Figma "trust" (499:1537), a 1500 × 882 frame.
-   Sizes are Figma px times --s, the same screen scale the hero and testimonials use, so type
-   stays in proportion from one section to the next. The section flows normally (no pinning).
+   Trust: Figma 539:1526, a 1440 × 980 frame on #1d2024. Static.
+   A 1352 × 662 card (44 from the left, centred vertically) holds a house photo, a blurred dark shape
+   under the stats, and a diagonal fade from #1d2024; on top, the statement (Roboto Slab 64/72) and three stats.
+   Sizes are Figma px times --s, like the other sections.
 ---------------------------------------------------------------- */
 
 .trust {
   position: relative;
-  background: var(--color-white);
+  background: var(--color-secondary);
+  color: var(--color-white);
   container: trust / inline-size;
 
-  --W: 1500;
-  --H: 900; /* the screen height the other sections fit to */
+  --W: 1440;
+  --H: 900;
   --s: min(100cqw / var(--W), 100vh / var(--H));
   --frame-x: calc((100cqw - var(--W) * var(--s)) / 2);
-
-  --pad-x: 79;
-  --pad-y: 64;
-  --title: 88; /* Roboto Slab 400, 88/104, -3% */
-  --title-lh: 1.1818;
-  --gap: 64; /* statement → stats */
-  --stat: 56; /* Roboto Slab 500, -4% */
-  --label: 20; /* Switzer 400 */
-  --stat-gap: 24;
-  --label-gap: 10;
 }
 
+.trust-frame {
+  padding: calc(159 * var(--s)) 0;
+}
+
+.trust-card {
+  position: relative;
+  width: calc(1352 * var(--s));
+  height: calc(662 * var(--s));
+  margin-left: calc(var(--frame-x) + 44 * var(--s));
+  overflow: hidden;
+  background: #f4d6d6; /* shows only while the photo loads */
+}
+
+/* Photo: 1410 × 984, 19 left of the card and 204 above it (Figma crop) */
+.trust-photo {
+  position: absolute;
+  left: calc(-19 * var(--s));
+  top: calc(-204 * var(--s));
+  width: calc(1410 * var(--s));
+  height: calc(984 * var(--s));
+  max-width: none;
+  object-fit: cover;
+}
+/* Blurred dark shape behind the stats (Figma "Vector 19", drawn with its blur margin) */
+.trust-shade {
+  position: absolute;
+  left: calc(-160.9 * var(--s));
+  top: calc(152.1 * var(--s));
+  width: calc(1381.8 * var(--s));
+  height: calc(670.3 * var(--s));
+  max-width: none;
+  pointer-events: none;
+}
+.trust-fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(-71.83deg, rgb(29 32 36 / 0) 6.92%, #1d2024 71.34%);
+}
+
+.trust-title {
+  position: absolute;
+  left: calc(76 * var(--s));
+  top: calc(44 * var(--s));
+  width: calc(793 * var(--s));
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: calc(64 * var(--s)); /* Roboto Slab 400, 64/72, -3% */
+  line-height: 1.125;
+  letter-spacing: -0.03em;
+}
+.trust-title span,
+.trust-label span {
+  display: block;
+}
+
+.trust-stats {
+  position: absolute;
+  left: calc(76 * var(--s));
+  bottom: calc(44 * var(--s));
+  width: calc(692 * var(--s));
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(24 * var(--s));
+}
+.trust-value {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: calc(48 * var(--s)); /* Roboto Slab 400, 48, -4% */
+  line-height: 1.32;
+  letter-spacing: -0.04em;
+}
+.trust-label {
+  margin-top: calc(10 * var(--s));
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: max(13px, calc(17 * var(--s))); /* Switzer 400, 17, #c9c9c9 */
+  line-height: 1.3;
+  color: #c9c9c9;
+}
+
+/* ---- Portrait screens: a tall card, the text in the flow, a top-to-bottom fade ---- */
 @media (aspect-ratio <= 1) {
   .trust {
     --W: 390;
     --H: 844;
-    --s: min(100cqw / var(--W), 100vh / var(--H));
-    --pad-x: 20;
-    --pad-y: 64;
-    --title: 34;
-    --title-lh: 1.18;
-    --gap: 44;
-    --stat: 44;
-    --label: 16;
-    --stat-gap: 22;
-    --label-gap: 6;
   }
-}
-
-.trust-inner {
-  padding: calc(var(--pad-y) * var(--s)) calc(var(--frame-x) + var(--pad-x) * var(--s));
-}
-
-.trust-title {
-  font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: calc(var(--title) * var(--s));
-  line-height: var(--title-lh);
-  letter-spacing: -0.03em;
-  color: #000;
-}
-/* One sentence per block, as in Figma. Portrait screens balance each one so no word is left alone. */
-.trust-title span {
-  display: block;
-}
-@media (aspect-ratio <= 1) {
-  .trust-title span {
-    text-wrap: balance;
+  .trust-frame {
+    padding: calc(56 * var(--s)) calc(var(--frame-x) + 20 * var(--s));
   }
-}
-
-.trust-stats {
-  margin-top: calc(var(--gap) * var(--s));
-  display: grid;
-  gap: calc(var(--stat-gap) * var(--s));
-}
-
-.trust-value {
-  font-family: var(--font-heading);
-  font-weight: 500;
-  font-size: calc(var(--stat) * var(--s));
-  line-height: 1.32; /* Figma "normal": 74px at 56px */
-  letter-spacing: -0.04em;
-  color: var(--color-secondary);
-}
-
-.trust-label {
-  margin-top: calc(var(--label-gap) * var(--s));
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: max(14px, calc(var(--label) * var(--s)));
-  line-height: 1.3; /* Figma "normal": 26px at 20px */
-  color: var(--color-gray-80);
+  .trust-card {
+    width: auto;
+    height: auto;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: calc(160 * var(--s));
+    padding: calc(28 * var(--s)) calc(20 * var(--s));
+  }
+  .trust-photo {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-position: 70% 60%;
+  }
+  .trust-shade {
+    display: none;
+  }
+  .trust-fade {
+    background: linear-gradient(
+      to bottom,
+      rgb(29 32 36 / 0.92) 0%,
+      rgb(29 32 36 / 0.45) 45%,
+      rgb(29 32 36 / 0.55) 60%,
+      rgb(29 32 36 / 0.95) 100%
+    );
+  }
+  .trust-title,
+  .trust-stats {
+    position: relative;
+    inset: auto;
+    width: auto;
+  }
+  .trust-title {
+    font-size: calc(30 * var(--s));
+    line-height: 1.15;
+  }
+  .trust-stats {
+    gap: calc(12 * var(--s));
+  }
+  .trust-value {
+    font-size: calc(30 * var(--s));
+  }
+  .trust-label {
+    margin-top: calc(6 * var(--s));
+    font-size: 13px;
+  }
 }

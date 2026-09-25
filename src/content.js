@@ -1,6 +1,35 @@
 // Site copy and media, section by section. Copy follows the Figma file "Claude -> ME"; any change is noted
 // above the section it belongs to.
 
+// Figma 530:1058: typical contractor vs Reidius Infra, one row per topic.
+export const compare = {
+  titleLines: ['No hidden margins.', 'No hidden compromises'],
+  topics: ['Materials', 'Changes midway', 'Timeline', 'Design and supervision', 'Accountability'],
+  them: {
+    labelLines: ['Typical', 'local contractor'],
+    titleLines: ['No fixed', 'fee'],
+    cells: [
+      'Cheaper brand, same bill',
+      'Charged extra, or skipped',
+      '“Extra kaam” shows up at the end',
+      'Deadline slip, costs follow',
+      'Thekedar, mistri, supplier. Nobody owns it.',
+    ],
+  },
+  us: {
+    labelLines: ['Reidius', 'infra'],
+    titleLines: ['No hidden', 'margins'],
+    cells: [
+      'Wholesale rates, bill in your app',
+      'Included, with one project manager',
+      'Nothing added without your approval',
+      'Handover schedule in your contract',
+      'One name, start to finish',
+    ],
+    extras: ['Dedicated project manager', 'Accurate budget estimate', '2 years free maintenance', 'Every expense on the app'],
+  },
+}
+
 // Figma 500:2149 ("3rd section", frames 499:1713 → 500:2117): the people you'd otherwise manage stream out of
 // "Building your own" and come out of "Building with Reidius" as one chip.
 // Each chip has two positions (Figma px, inside the chip cluster): `wide` is Figma's 710 × 182 cluster,
@@ -27,13 +56,15 @@ export const problem = {
   ],
 }
 
-// Figma 499:1537 ("trust"). The statement breaks after "EXPERTISE."; the rest wraps to the width.
+// Figma 539:1526 (replaces 499:1537): the statement and stats on a house photo, inside a dark card.
+// The photo is Figma's; it is only 800 px wide, so it looks soft at full desktop size.
 export const trust = {
   lines: ['YOUR VISION. OUR EXPERTISE.', 'FROM OPEN LAND TO A HOME BUILT TO LAST.'],
+  photo: '/trust/house.webp',
   stats: [
-    { value: '250+', label: 'Homes built in Jaipur' },
-    { value: '50+', label: 'Architects, engineers and designers' },
-    { value: '2 yrs', label: 'Free maintenance after handover' },
+    { value: '250+', labelLines: ['Homes built in', 'Jaipur'] },
+    { value: '50+', labelLines: ['Architects, engineers', 'and designers'] },
+    { value: '2 yrs', labelLines: ['Free maintenance', 'after handover'] },
   ],
 }
 

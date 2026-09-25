@@ -1,5 +1,6 @@
 import Hero from './sections/Hero'
 import Testimonials from './sections/Testimonials'
+import Compare from './sections/Compare'
 import Problem from './sections/Problem'
 import Trust from './sections/Trust'
 import Contractor from './sections/Contractor'
@@ -16,6 +17,7 @@ export default function App() {
       <main id="main">
         <Hero />
         <Testimonials />
+        <Compare />
         <Problem />
         <Trust />
         <Contractor />
